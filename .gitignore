@@ -1,0 +1,15 @@
+*.swp
+__pycache__
+*.sqlite3
+.DS_Store
+*.pyc
+*.mp3
+*.wav
+*.flac
+*.mid
+*.ipynb*
+.env
+old
+*.rdb
+staticfiles
+requirements_conda.txt
