@@ -8,7 +8,7 @@ __pycache__
 *.flac
 *.mid
 *.ipynb*
-.env
+.env*
 old
 *.rdb
 staticfiles
