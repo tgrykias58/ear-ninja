@@ -1,0 +1,13 @@
+
+{% extends "exercises/base.html" %}
+
+{% block content %}
+<div class="container">
+    <p class="h1">Choose exercise:</p>
+    <div class="d-grid gap-3">
+        <a href={% url 'exercises:intervals_question' %} class="btn btn-primary btn-lg btn-block" role="button">Intervals</a>
+        <a href={% url 'exercises:scale_degrees_question' %} class="btn btn-primary btn-lg btn-block" role="button">Scale Degrees</a>
+    </div>
+</div>
+
+{% endblock %} 
