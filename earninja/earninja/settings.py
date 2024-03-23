@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
+    'crispy_bootstrap5',
     'exercises.apps.ExercisesConfig',
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -61,7 +64,7 @@ ROOT_URLCONF = 'earninja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -154,3 +157,12 @@ SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
 SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', 0))
 SECURE_HSTS_PRELOAD = os.environ.get('SECURE_HSTS_PRELOAD', 'False') == 'True'
 SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'False') == 'True'
+
+# crispy forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# https://docs.djangoproject.com/en/4.2/ref/settings/#login-redirect-url
+# https://docs.djangoproject.com/en/4.2/ref/settings/#logout-redirect-url
+LOGIN_REDIRECT_URL = "exercises:choose_exercise"
+LOGOUT_REDIRECT_URL = "exercises:choose_exercise"
