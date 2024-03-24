@@ -10,6 +10,8 @@ __pycache__
 *.ipynb*
 .env*
 old
+new
 *.rdb
 staticfiles
 requirements_conda.txt
+.coverage
