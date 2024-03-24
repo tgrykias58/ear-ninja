@@ -8,15 +8,15 @@ class SignUpViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):  
-        response = self.client.get(reverse("accounts:signup"))
+        response = self.client.get(reverse("signup"))
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):  
-        response = self.client.get(reverse("accounts:signup"))
+        response = self.client.get(reverse("signup"))
         self.assertTemplateUsed(response, "registration/signup.html")
     
     def test_template_content(self):
-        response = self.client.get(reverse("accounts:signup"))
+        response = self.client.get(reverse("signup"))
         self.assertContains(response, "Log in")
 
     def test_user_can_sing_up(self):
@@ -25,7 +25,7 @@ class SignUpViewTests(TestCase):
         self.assertFalse(login)
         # user signs up
         response = self.client.post(
-            reverse("accounts:signup"), {
+            reverse("signup"), {
                 "username": "just_user123",
                 "password1": "Mf9rGyjAgMTA",
                 "password2": "Mf9rGyjAgMTA",

@@ -20,7 +20,23 @@
             </button>
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <ul class="navbar-nav">
-                    {% block nav_items %}{% endblock %} 
+                    {% block nav_items %}
+
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" id="logout-button-form">{% csrf_token %}</form>
+                    <li class="nav-item">
+                        <button type="submit" class="btn btn-outline-warning" form="logout-button-form">Log out</button>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url "login" %}" class="btn btn-outline-success" role="button">Log in</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url "signup" %}" class="btn btn-outline-success" role="button">Sign up</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% endblock %} 
                 </ul>
             </div>
         </div>

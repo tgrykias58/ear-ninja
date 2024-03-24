@@ -1,8 +1,16 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse  
 
+from django.contrib.auth import get_user_model
 
-class ChooseExerciseViewTests(SimpleTestCase):
+
+class ChooseExerciseViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        User = get_user_model()
+        test_user = User.objects.create_user(username='just_user', password='r6S6FrpHzFqf')
+        test_user.save()
+
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
@@ -19,6 +27,27 @@ class ChooseExerciseViewTests(SimpleTestCase):
         response = self.client.get(reverse("exercises:choose_exercise"))
         self.assertContains(response, reverse("exercises:intervals_question"))
         self.assertContains(response, reverse("exercises:scale_degrees_question"))
+    
+    def test_logged_in_user_can_log_out(self):
+        # test user logs in
+        login = self.client.login(username='just_user', password='r6S6FrpHzFqf')
+        # make sure login was successful
+        self.assertTrue(login)
+
+        response = self.client.get(reverse("exercises:choose_exercise"))
+        # we show only the logout option to the user
+        self.assertContains(response, reverse("logout"))
+        # it doesn't make sense to show login option when user has already logged in
+        self.assertNotContains(response, reverse("signup"))
+        self.assertNotContains(response, reverse("login"))
+    
+    def test_logged_out_user_can_log_in(self):
+        response = self.client.get(reverse("exercises:choose_exercise"))
+        # user isn't logged in, so it doesn't make sense to show the logout option
+        self.assertNotContains(response, reverse("logout"))
+        # user can log in or sign up
+        self.assertContains(response, reverse("signup"))
+        self.assertContains(response, reverse("login"))
 
 
 class IntervalsQuestionViewTests(SimpleTestCase):
