@@ -1,6 +1,6 @@
 from django.db import models
 
-from exercises.file_path_manager import FilePathManager
+from exercises.audio_file_path_manager import AudioFilePathManager
 
 
 class Interval(models.Model):
@@ -12,7 +12,7 @@ class Interval(models.Model):
 
 
 class IntervalInstance(models.Model):
-    audio = models.FileField(upload_to=FilePathManager.get_interval_audio_path)
+    audio = models.FileField(upload_to=AudioFilePathManager.get_interval_audio_path)
     start_note = models.IntegerField()
     interval = models.ForeignKey(Interval, on_delete=models.CASCADE)
 
@@ -22,7 +22,7 @@ class IntervalInstance(models.Model):
     # thanks to this method
     # the url can be accessed even before audio FileField is set
     def get_audio_url(self):
-        audio_path = FilePathManager.get_interval_audio_path(self)
+        audio_path = AudioFilePathManager.get_interval_audio_path(self)
         # https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.FileField.storage
         # https://docs.djangoproject.com/en/4.2/ref/files/storage/#django.core.files.storage.Storage.url
         return self.audio.field.storage.url(audio_path)

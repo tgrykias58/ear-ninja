@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-class FilePathManager:
+class AudioFilePathManager:
     @classmethod
     def get_interval_audio_path(cls, interval_instance, filename=None):
         # keep filename arg unused to avoid circularity
