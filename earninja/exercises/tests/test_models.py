@@ -7,6 +7,7 @@ from exercises.models import (
     IntervalsExercise,
     IntervalsExerciseSettings,
     IntervalAnswer,
+    ExerciseScore,
 )
 
 
@@ -48,6 +49,7 @@ class IntervalInstanceModelTests(TestCase):
 
 class IntervalsExerciseModelTests(TestCase):
     def setUp(self):
+        # create settings
         settings = IntervalsExerciseSettings.objects.create(
             lowest_octave=3, 
             highest_octave=5,
@@ -57,21 +59,28 @@ class IntervalsExerciseModelTests(TestCase):
             Interval.objects.create(name="#4", num_semitones=6),
             Interval.objects.create(name="5", num_semitones=7)
         ])
+        # create interval instances for question and answers
         question = IntervalInstance.objects.create(start_note=4*12, interval=settings.allowed_intervals.get(name="b3"))
         answers = [
             question,
             IntervalInstance.objects.create(start_note=4*12, interval=settings.allowed_intervals.get(name="#4")),
             IntervalInstance.objects.create(start_note=4*12, interval=settings.allowed_intervals.get(name="5")),
         ]
+        # create a user
         User = get_user_model()
         test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
         test_user.save()
+        # create score object
+        score = ExerciseScore.objects.create()
+        # finally, create intervals exercise object
         self.exercise = IntervalsExercise.objects.create(
             question=question,
             user=test_user,
             settings=settings,
+            score=score,
         )
         self.exercise.answers.set(answers)
+        # set correct answer
         answer = IntervalAnswer.objects.get(exercise=self.exercise, interval_instance=question)
         answer.is_correct = True
         answer.save()
@@ -102,6 +111,12 @@ class IntervalsExerciseModelTests(TestCase):
     def test_deleting_user_deletes_exercise(self):
         self.exercise.user.delete()
         self.assertEqual(IntervalsExercise.objects.count(), 0)
+    
+    def test_deleting_score_does_not_delete_exercise(self):
+        ExerciseScore.objects.get(id=1).delete()
+        self.assertEqual(IntervalsExercise.objects.count(), 1)
+        exercise = IntervalsExercise.objects.get(id=1)
+        self.assertEqual(exercise.score, None)
     
 
 class IntervalsExerciseSettingsModelTests(TestCase):
@@ -135,3 +150,17 @@ class IntervalsExerciseSettingsModelTests(TestCase):
             str(self.settings),
             "settings for exercise for user: test_user"
         )
+
+
+class ExerciseScoreModelTests(TestCase):
+    def setUp(self):
+        self.score = ExerciseScore.objects.create(
+            num_correct_answers=3,
+            num_all_answers=9,
+        )
+    
+    def test_object_name_is_correct_slash_all_and_then_percentage(self):
+        self.assertEqual(str(self.score), "3/9 (33.33%)")
+
+    def test_display_as_percentage(self):
+        self.assertEqual(self.score.display_as_percentage(), "33.33%")

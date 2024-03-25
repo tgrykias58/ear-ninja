@@ -38,6 +38,7 @@ class IntervalsExercise(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     settings = models.OneToOneField("IntervalsExerciseSettings", null=True, on_delete=models.SET_NULL, related_name="exercise")
+    score = models.OneToOneField("ExerciseScore", null=True, on_delete=models.SET_NULL, related_name="exercise")
 
     def __str__(self):
         return f'exercise for user: {self.user}'
@@ -62,3 +63,14 @@ class IntervalsExerciseSettings(models.Model):
             return f'settings for {self.exercise}'
         else:
             return f'settings (id={self.id}), no exercise'
+
+
+class ExerciseScore(models.Model):
+    num_correct_answers = models.IntegerField(default=0)
+    num_all_answers = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.num_correct_answers}/{self.num_all_answers} ({self.display_as_percentage()})'
+
+    def display_as_percentage(self):
+        return f'{100 * self.num_correct_answers / self.num_all_answers:.2f}%'
