@@ -166,3 +166,23 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#logout-redirect-url
 LOGIN_REDIRECT_URL = "exercises:choose_exercise"
 LOGOUT_REDIRECT_URL = "exercises:choose_exercise"
+
+# AudioSaver
+# parameters for generation of audio files for exercises
+
+# required for conversion of midi to wav with fluidsynth
+# https://github.com/FluidSynth/fluidsynth/wiki/SoundFont
+SOUNDFONT_PATH = os.getenv('SOUNDFONT_PATH')
+FLUIDSYNTH_PATH = os.getenv('FLUIDSYNTH_PATH')
+
+# by default fluidsynth output is quiet
+# this setting is for how much to increase volume of the sound in exercises
+# volume is increased using pydub
+# https://github.com/jiaaro/pydub
+NUM_DB_LOUDER = 20
+
+# it's possible to make sound louder by increasing
+# gain passed to fluidsynth
+# it can distort sound though
+FLUIDSYNTH_GAIN = 0.2
+FLUIDSYNTH_SAMPLE_RATE = 44100
