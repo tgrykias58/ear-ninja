@@ -118,6 +118,12 @@ class IntervalsExerciseModelTests(TestCase):
         exercise = IntervalsExercise.objects.get(id=1)
         self.assertEqual(exercise.score, None)
     
+    def test_deleting_settings_does_not_delete_exercise(self):
+        IntervalsExerciseSettings.objects.get(id=1).delete()
+        self.assertEqual(IntervalsExercise.objects.count(), 1)
+        exercise = IntervalsExercise.objects.get(id=1)
+        self.assertEqual(exercise.settings, None)
+    
 
 class IntervalsExerciseSettingsModelTests(TestCase):
     def setUp(self):
