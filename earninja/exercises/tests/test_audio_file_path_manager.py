@@ -16,10 +16,10 @@ class AudioFilePathManagerTests(TestCase):
 
     def test_get_interval_audio_path(self):
         self.assertEqual(
-            str(AudioFilePathManager.get_interval_audio_path(self.interval_instance_1)), 
-            "audio/interval_1.mp3"
+            str(AudioFilePathManager.get_interval_instance_audio_path(self.interval_instance_1)), 
+            "audio/interval_instance_1.mp3"
         )
         self.assertEqual(
-            str(AudioFilePathManager.get_interval_audio_path(self.interval_instance_2)), 
-            "audio/interval_2.mp3"
+            str(AudioFilePathManager.get_interval_instance_audio_path(self.interval_instance_2)), 
+            "audio/interval_instance_2.mp3"
         )

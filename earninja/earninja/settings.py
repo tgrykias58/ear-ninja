@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'exercises.apps.ExercisesConfig',
-    "accounts",
+    'accounts',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -186,3 +187,12 @@ NUM_DB_LOUDER = 20
 # it can distort sound though
 FLUIDSYNTH_GAIN = 0.2
 FLUIDSYNTH_SAMPLE_RATE = 44100
+
+# Celery settings
+# Celery it not supported on PythonAnywhere
+# so in production, audio file generation runs synchronously
+USE_CELERY = False
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+

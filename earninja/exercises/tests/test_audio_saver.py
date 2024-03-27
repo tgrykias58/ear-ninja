@@ -57,3 +57,6 @@ class AudioSaverTests(SimpleTestCase):
 
         file_path = self.test_media_dir / "interval_42.mp3"
         self.assertFalse(file_path.exists())
+
+        # to make sure that there are no errors if files are already deleted
+        audio_saver.delete_files()

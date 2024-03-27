@@ -14,6 +14,7 @@ class AudioSaver:
         self._load_settings()
     
     def save_interval_instance_audio(self, start_note, interval_name):
+        self._ensure_audio_dir_exists()
         interval_container = self._get_interval_container(start_note, interval_name)
         self._save_midi(interval_container)
         self._midi_to_wav()
@@ -21,7 +22,7 @@ class AudioSaver:
     
     def delete_files(self):
         for suffix in [".mid", ".wav", ".mp3"]:
-            self.audio_path.with_suffix(suffix).unlink()
+            self.audio_path.with_suffix(suffix).unlink(missing_ok=True)
 
     def _load_settings(self):
         self.num_db_louder = settings.NUM_DB_LOUDER
@@ -29,6 +30,9 @@ class AudioSaver:
         self.sample_rate = settings.FLUIDSYNTH_SAMPLE_RATE
         self.soundfont_path = settings.SOUNDFONT_PATH
         self.fluidsynth_path = settings.FLUIDSYNTH_PATH
+    
+    def _ensure_audio_dir_exists(self):
+        self.audio_path.parent.mkdir(parents=True, exist_ok=True)
     
     def _get_interval_container(self, start_note, interval_name):
         start_note = Note().from_int(start_note)

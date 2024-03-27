@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             name='IntervalInstance',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('audio', models.FileField(upload_to=exercises.audio_file_path_manager.AudioFilePathManager.get_interval_audio_path)),
+                ('audio', models.FileField(upload_to=exercises.audio_file_path_manager.AudioFilePathManager.get_interval_instance_audio_path)),
                 ('start_note', models.IntegerField()),
                 ('interval', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exercises.interval')),
             ],

@@ -43,8 +43,8 @@ class IntervalInstanceModelTests(TestCase):
         interval_instance_1 = IntervalInstance.objects.get(id=1)
         interval_instance_2 = IntervalInstance.objects.get(id=2)
 
-        self.assertEqual(interval_instance_1.get_audio_url(), "/media/audio/interval_1.mp3")
-        self.assertEqual(interval_instance_2.get_audio_url(), "/media/audio/interval_2.mp3")
+        self.assertEqual(interval_instance_1.get_audio_url(), "/media/audio/interval_instance_1.mp3")
+        self.assertEqual(interval_instance_2.get_audio_url(), "/media/audio/interval_instance_2.mp3")
 
 
 class IntervalsExerciseModelTests(TestCase):
@@ -106,7 +106,7 @@ class IntervalsExerciseModelTests(TestCase):
 
         self.assertEqual(IntervalsExercise.objects.count(), 1)
         exercise = IntervalsExercise.objects.get(id=1)
-        self.assertEqual(exercise.question, None)
+        self.assertIsNone(exercise.question)
 
     def test_deleting_user_deletes_exercise(self):
         self.exercise.user.delete()
@@ -116,13 +116,13 @@ class IntervalsExerciseModelTests(TestCase):
         ExerciseScore.objects.get(id=1).delete()
         self.assertEqual(IntervalsExercise.objects.count(), 1)
         exercise = IntervalsExercise.objects.get(id=1)
-        self.assertEqual(exercise.score, None)
+        self.assertIsNone(exercise.score)
     
     def test_deleting_settings_does_not_delete_exercise(self):
         IntervalsExerciseSettings.objects.get(id=1).delete()
         self.assertEqual(IntervalsExercise.objects.count(), 1)
         exercise = IntervalsExercise.objects.get(id=1)
-        self.assertEqual(exercise.settings, None)
+        self.assertIsNone(exercise.settings)
     
 
 class IntervalsExerciseSettingsModelTests(TestCase):
