@@ -5,6 +5,7 @@ from exercises.models import (
     Interval
 )
 from exercises.music_theory_utils import get_num_semitones
+from exercises.tasks import update_interval_instance_audio
 
 
 class IntervalsExerciseUpdater:
@@ -21,6 +22,16 @@ class IntervalsExerciseUpdater:
         self._set_allowed_intervals(default_settings, settings.INTERVALS_DEFAULT_ALLOWED_INTERVALS)
         self.exercise.settings = default_settings
         self.exercise.save()
+    
+    def save_audio_files(self):
+        # question interval should be among answers
+        # so it's not necessary to update audio file for it separately
+        for answer in self.exercise.answers.all():
+            if not answer.audio:
+                if settings.USE_CELERY:
+                    update_interval_instance_audio.delay(answer.id)
+                else:
+                    update_interval_instance_audio(answer.id)
     
     def _set_allowed_intervals(self, exercise_settings, allowed_interval_names):
         allowed_intervals = [
