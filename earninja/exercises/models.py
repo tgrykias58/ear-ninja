@@ -47,7 +47,7 @@ class IntervalsExercise(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     settings = models.OneToOneField("IntervalsExerciseSettings", null=True, on_delete=models.SET_NULL, related_name="exercise")
-    score = models.OneToOneField("ExerciseScore", null=True, on_delete=models.SET_NULL, related_name="exercise")
+    score = models.OneToOneField("ExerciseScore", null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'exercise for user: {self.user}'

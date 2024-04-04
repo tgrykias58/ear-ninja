@@ -4,6 +4,7 @@ from django.conf import settings
 
 from exercises.models import (
     IntervalsExerciseSettings,
+    ExerciseScore,
     Interval,
     IntervalInstance,
     IntervalAnswer,
@@ -55,6 +56,15 @@ class IntervalsExerciseUpdater:
                     update_interval_instance_audio.delay(answer.id)
                 else:
                     update_interval_instance_audio(answer.id)
+    
+    def update_score(self, user_answer):
+        score = ExerciseScore.objects.get_or_create(intervalsexercise=self.exercise)[0]
+        correct_answer = self.exercise.answers.get(intervalanswer__is_correct=True)
+        score.num_all_answers += 1
+        if correct_answer == user_answer:
+            score.num_correct_answers += 1
+        score.save()
+        self.exercise.save()
     
     def _get_random_start_note(self):
         lowest_note = self.exercise.settings.lowest_octave * self.NUM_NOTES_IN_OCTAVE

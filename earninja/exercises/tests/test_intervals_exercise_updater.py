@@ -39,14 +39,12 @@ class IntervalsExerciseUpdaterTests(TestCase):
         User = get_user_model()
         test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
         test_user.save()
-        # create score object
-        score = ExerciseScore.objects.create()
         # create intervals exercise object
         exercise = IntervalsExercise.objects.create(
             question=None,
             settings=None,
             user=test_user,
-            score=score,
+            score=None,
         )
         # create updater for this exercise
         self.updater = IntervalsExerciseUpdater(exercise)
@@ -126,11 +124,11 @@ class IntervalsExerciseUpdaterTests(TestCase):
     
     def _set_question_and_answers(self, exercise):
         # create interval instances for question and answers
-        question = IntervalInstance.objects.create(start_note=4*12, interval=exercise.settings.allowed_intervals.get(name="b3"))
+        question = IntervalInstance.objects.create(start_note=5, interval=exercise.settings.allowed_intervals.get(name="b3"))
         answers = [
             question,
-            IntervalInstance.objects.create(start_note=4*12, interval=exercise.settings.allowed_intervals.get(name="#4")),
-            IntervalInstance.objects.create(start_note=4*12, interval=exercise.settings.allowed_intervals.get(name="5")),
+            IntervalInstance.objects.create(start_note=5, interval=exercise.settings.allowed_intervals.get(name="#4")),
+            IntervalInstance.objects.create(start_note=5, interval=exercise.settings.allowed_intervals.get(name="5")),
         ]
         exercise.question = question
         exercise.save()
@@ -197,3 +195,26 @@ class IntervalsExerciseUpdaterTests(TestCase):
             correct_answers.first(), 
             IntervalInstance.objects.get(interval__name="#4", start_note=3), 
         )
+
+    def test_update_score_correct_answer(self):
+        self.updater.exercise.settings = self.custom_settings
+        self.updater.exercise.save()
+        self.updater.generate_new_question()
+
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        self.updater.update_score(exercise.question)
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        self.assertEqual(exercise.score.num_all_answers, 1)
+        self.assertEqual(exercise.score.num_correct_answers, 1)
+
+    def test_update_score_wrong_answer(self):
+        self.updater.exercise.settings = self.custom_settings
+        self.updater.exercise.save()
+        self.updater.generate_new_question()
+
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        wrong_answer = exercise.answers.exclude(id=exercise.question.id).first()
+        self.updater.update_score(wrong_answer)
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        self.assertEqual(exercise.score.num_all_answers, 1)
+        self.assertEqual(exercise.score.num_correct_answers, 0)
