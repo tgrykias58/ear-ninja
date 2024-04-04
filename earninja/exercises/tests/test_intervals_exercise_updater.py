@@ -2,6 +2,8 @@ import shutil
 from pathlib import Path
 from unittest.mock import patch
 
+from mingus.containers import Note
+
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -25,8 +27,8 @@ class IntervalsExerciseUpdaterTests(TestCase):
         self.test_media_dir.mkdir(parents=True, exist_ok=True)
         # create custom settings
         self.custom_settings = IntervalsExerciseSettings.objects.create(
-            lowest_octave=2, 
-            highest_octave=12,
+            lowest_octave=-1, 
+            highest_octave=1,
         )
         self.custom_settings.allowed_intervals.set([
             Interval.objects.create(name="b3", num_semitones=3),
@@ -77,7 +79,6 @@ class IntervalsExerciseUpdaterTests(TestCase):
     def _assertSettingsAreDefault(self, exercise):
         self.assertEqual(exercise.settings.lowest_octave, settings.INTERVALS_DEFAULT_LOWEST_OCTAVE)
         self.assertEqual(exercise.settings.highest_octave, settings.INTERVALS_DEFAULT_HIGHEST_OCTAVE)
-
         actual_allowed_interval_names = sorted([interval.name for interval in exercise.settings.allowed_intervals.all()])
         self.assertListEqual(actual_allowed_interval_names, sorted(settings.INTERVALS_DEFAULT_ALLOWED_INTERVALS))
     
@@ -147,3 +148,52 @@ class IntervalsExerciseUpdaterTests(TestCase):
         # clean up the original audio file
         # it doesn't delete the copy of the file set to the audio field
         file_path.unlink()
+    
+    def test_generate_new_question(self):
+        self.updater.exercise.settings = self.custom_settings
+        self.updater.exercise.save()
+
+        self.updater.generate_new_question()
+
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        allowed_intervals_names = [interval.name for interval in self.custom_settings.allowed_intervals.all()]
+        
+        self.assertIn(exercise.question.interval.name, allowed_intervals_names)
+        self.assertListEqual(sorted([answer.interval.name for answer in exercise.answers.all()]), sorted(allowed_intervals_names))
+        for answer in exercise.answers.all():
+            self.assertEqual(exercise.question.start_note, answer.start_note)
+        self.assertGreaterEqual(Note().from_int(exercise.question.start_note).octave, self.custom_settings.lowest_octave)
+        self.assertLessEqual(Note().from_int(exercise.question.start_note).octave, self.custom_settings.highest_octave)
+        self.assertEqual(exercise.answers.get(intervalanswer__is_correct=True), exercise.question)
+    
+    @patch.object(IntervalsExerciseUpdater, '_get_random_question_interval')
+    @patch.object(IntervalsExerciseUpdater, '_get_random_start_note', side_effect=[3, 3])
+    def test_generate_new_question_clears_prevous_correct_answer(
+        self,
+        mock__get_random_start_note, 
+        mock_get_random_question_interval
+    ):
+        mock_get_random_question_interval.side_effect = [
+            self.custom_settings.allowed_intervals.get(name="b3"),
+            self.custom_settings.allowed_intervals.get(name="#4"),
+        ]
+        self.updater.exercise.settings = self.custom_settings
+        self.updater.exercise.save()
+
+        self.updater.generate_new_question()
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        self.assertEqual(
+            exercise.answers.get(intervalanswer__is_correct=True), 
+            IntervalInstance.objects.get(interval__name="b3", start_note=3), 
+        )
+
+        self.updater.generate_new_question()
+        exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
+        correct_answers = exercise.answers.filter(intervalanswer__is_correct=True)
+        # check that previous correct answer is no longer marked as correct
+        self.assertNotIn(IntervalInstance.objects.get(interval__name="b3", start_note=3), correct_answers)
+        self.assertEqual(correct_answers.count(), 1)
+        self.assertEqual(
+            correct_answers.first(), 
+            IntervalInstance.objects.get(interval__name="#4", start_note=3), 
+        )

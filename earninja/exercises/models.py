@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint 
 from django.conf import settings
 
 from exercises.audio_file_path_manager import AudioFilePathManager
@@ -20,6 +21,14 @@ class IntervalInstance(models.Model):
     start_note = models.IntegerField()
     interval = models.ForeignKey(Interval, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            UniqueConstraint(  
+                fields=['start_note', 'interval'],
+                name='interval_instance_is_defined_by_interval_and_start_note'
+            )
+        ]
+        
     def __str__(self):
         return f'{self.interval.name}, start note: {self.start_note}'
     
