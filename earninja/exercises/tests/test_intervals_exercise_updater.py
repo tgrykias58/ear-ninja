@@ -14,7 +14,6 @@ from exercises.models import (
     IntervalsExerciseSettings,
     Interval,
     IntervalInstance,
-    ExerciseScore,
 )
 from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 

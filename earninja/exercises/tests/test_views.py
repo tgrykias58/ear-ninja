@@ -50,23 +50,33 @@ class ChooseExerciseViewTests(TestCase):
         self.assertContains(response, reverse("login"))
 
 
-class IntervalsQuestionViewTests(SimpleTestCase):
+class IntervalsQuestionViewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
+        test_user.save()
+        self.client.login(username='test_user', password='r6S6FrpHzFqf')
+
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/intervals/question")
         self.assertEqual(response.status_code, 200)
 
-    def test_url_available_by_name(self):  
+    def test_url_available_by_name(self):
         response = self.client.get(reverse("exercises:intervals_question"))
         self.assertEqual(response.status_code, 200)
-
-    def test_template_name_correct(self):  
+    
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(reverse("exercises:intervals_question"))
-        self.assertTemplateUsed(response, "exercises/coming_soon.html")
+        self.assertRedirects(response, '/accounts/login/?next=/intervals/question')
+
+    def test_template_name_correct(self):
+        response = self.client.get(reverse("exercises:intervals_question"))
+        self.assertTemplateUsed(response, "exercises/intervals_question.html")
 
     def test_template_content(self):
         response = self.client.get(reverse("exercises:intervals_question"))
-        self.assertContains(response, "coming soon")
-        self.assertContains(response, "Intervals")
+        self.assertContains(response, "Repeat")
 
 
 class ScaleDegreesQuestionViewTests(SimpleTestCase):
