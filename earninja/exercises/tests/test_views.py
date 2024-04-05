@@ -1,7 +1,11 @@
+from unittest.mock import patch
+
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse  
-
 from django.contrib.auth import get_user_model
+
+from exercises.models import IntervalsExercise
+from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 
 
 class ChooseExerciseViewTests(TestCase):
@@ -53,8 +57,8 @@ class ChooseExerciseViewTests(TestCase):
 class IntervalsQuestionViewTests(TestCase):
     def setUp(self):
         User = get_user_model()
-        test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
-        test_user.save()
+        self.test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
+        self.test_user.save()
         self.client.login(username='test_user', password='r6S6FrpHzFqf')
 
     def test_url_exists_at_correct_location(self):
@@ -78,6 +82,24 @@ class IntervalsQuestionViewTests(TestCase):
         response = self.client.get(reverse("exercises:intervals_question"))
         self.assertContains(response, "Repeat")
 
+    @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
+    @patch.object(IntervalsExerciseUpdater, '_get_random_start_note', side_effect=[4*12, 4*12 + 5])
+    def test_post_request_generates_new_question(self, mock_get_random_start_note, mock_save_audio_files):
+        # first post request for user
+        # in paricular there is no exercise object assigned to the user yet before the request
+        response = self.client.post(reverse("exercises:intervals_question"))
+        self.assertRedirects(response, reverse("exercises:intervals_question"))
+        self.assertEqual(mock_save_audio_files.call_count, 1)
+        question_after_first_post_request = IntervalsExercise.objects.get(user=self.test_user).question
+        # 2nd post request
+        response = self.client.post(reverse("exercises:intervals_question"))
+        self.assertRedirects(response, reverse("exercises:intervals_question"))
+        self.assertEqual(mock_save_audio_files.call_count, 2)
+        question_after_second_post_request = IntervalsExercise.objects.get(user=self.test_user).question
+        # assert question changed
+        # _get_random_start_note is patched so the question cannot stay the same by chance
+        self.assertNotEqual(question_after_first_post_request, question_after_second_post_request)
+        
 
 class ScaleDegreesQuestionViewTests(SimpleTestCase):
     def test_url_exists_at_correct_location(self):

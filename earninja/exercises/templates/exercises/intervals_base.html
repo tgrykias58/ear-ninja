@@ -6,10 +6,16 @@
 {% endblock %}
 
 {% block content %}
+<!-- Forms for POST buttons -->
+<form action="{% url 'exercises:intervals_question' %}" method="post" id="next-button-form">{% csrf_token %}</form>
+
 <div class="container">
 <div class="row">
     <div class="col-md-2 d-grid">
         <button type="button" id="repeat-button" class="btn btn-outline-success btn-lg">Repeat</button>
+    </div>
+    <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-outline-success btn-lg" form="next-button-form">Next</button>
     </div>
     <div class="col-2 offset-md-6 d-grid">
         <span class="h6">Volume: </span>
