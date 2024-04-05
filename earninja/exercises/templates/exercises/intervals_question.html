@@ -1,1 +1,12 @@
 {% extends "exercises/intervals_base.html" %}
+
+{% block answers %} 
+<form action="{% url 'exercises:intervals_answered' %}" method="post" id="answers-form">{% csrf_token %}</form>
+{% for answer in answers %}
+<div class="col d-grid">
+    <button type="submit" class="answer-button btn btn-primary" form="answers-form" name="answer_id" value="{{ answer.id }}">
+        {{ answer.interval.name }}
+    </button>
+</div>
+{% endfor %}
+{% endblock %}

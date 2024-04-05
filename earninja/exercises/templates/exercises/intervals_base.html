@@ -10,29 +10,32 @@
 <form action="{% url 'exercises:intervals_question' %}" method="post" id="next-button-form">{% csrf_token %}</form>
 
 <div class="container">
-<div class="row">
-    <div class="col-md-2 d-grid">
-        <button type="button" id="repeat-button" class="btn btn-outline-success btn-lg">Repeat</button>
+    <div class="row mb-4">
+        {% block answers %}{% endblock %}
     </div>
-    <div class="col-md-2 d-grid">
-        <button type="submit" class="btn btn-outline-success btn-lg" form="next-button-form">Next</button>
+    <div class="row">
+        <div class="col-md-2 d-grid">
+            <button type="button" id="repeat-button" class="btn btn-outline-success btn-lg">Repeat</button>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-success btn-lg" form="next-button-form">Next</button>
+        </div>
+        <div class="col-2 offset-md-6 d-grid">
+            <span class="h6">Volume: </span>
+            <input
+                type="range"
+                min="0.0"
+                max="1.0"
+                step="0.01"
+                value="0.5"
+                list="volumes"
+                name="volume" />
+            <datalist id="volumes">
+                <option value="0.0" label="Mute"></option>
+                <option value="1.0" label="100%"></option>
+            </datalist>
+        </div>
     </div>
-    <div class="col-2 offset-md-6 d-grid">
-        <span class="h6">Volume: </span>
-        <input
-            type="range"
-            min="0.0"
-            max="1.0"
-            step="0.01"
-            value="0.5"
-            list="volumes"
-            name="volume" />
-        <datalist id="volumes">
-            <option value="0.0" label="Mute"></option>
-            <option value="1.0" label="100%"></option>
-        </datalist>
-    </div>
-</div>
 </div>
 {% endblock %}
 

@@ -1,7 +1,8 @@
 from unittest.mock import patch
 
 from django.test import SimpleTestCase, TestCase
-from django.urls import reverse  
+from django.urls import reverse 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from exercises.models import IntervalsExercise
@@ -78,12 +79,28 @@ class IntervalsQuestionViewTests(TestCase):
         response = self.client.get(reverse("exercises:intervals_question"))
         self.assertTemplateUsed(response, "exercises/intervals_question.html")
 
-    def test_template_content(self):
+    def test_template_content_before_first_question(self):
         response = self.client.get(reverse("exercises:intervals_question"))
         self.assertContains(response, "Repeat")
+        self.assertContains(response, "Next")
+        # "next" button should have link to intervals question view
+        self.assertContains(response, reverse("exercises:intervals_question"))
+    
+    @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
+    def test_template_content_after_question_is_generated(self, mock_save_audio_files):
+        response = self.client.post(reverse("exercises:intervals_question"))
+        response = self.client.get(reverse("exercises:intervals_question"))
+        self.assertContains(response, "Repeat")
+        self.assertContains(response, "Next")
+        # "next" button should have link to intervals question view
+        self.assertContains(response, reverse("exercises:intervals_question"))
+        # buttons with answers are present
+        for interval_name in settings.INTERVALS_DEFAULT_ALLOWED_INTERVALS:
+            self.assertContains(response, interval_name)
+        self.assertContains(response, reverse("exercises:intervals_answered"))
 
     @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
-    @patch.object(IntervalsExerciseUpdater, '_get_random_start_note', side_effect=[4*12, 4*12 + 5])
+    @patch.object(IntervalsExerciseUpdater, '_get_random_start_note', side_effect=[3*12, 3*12 + 5])
     def test_post_request_generates_new_question(self, mock_get_random_start_note, mock_save_audio_files):
         # first post request for user
         # in paricular there is no exercise object assigned to the user yet before the request
@@ -99,8 +116,44 @@ class IntervalsQuestionViewTests(TestCase):
         # assert question changed
         # _get_random_start_note is patched so the question cannot stay the same by chance
         self.assertNotEqual(question_after_first_post_request, question_after_second_post_request)
-        
 
+
+class IntervalsAnsweredViewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
+        self.test_user.save()
+        self.client.login(username='test_user', password='r6S6FrpHzFqf')
+
+    def test_url_exists_at_correct_location(self):
+        response = self.client.get("/intervals/answered")
+        self.assertEqual(response.status_code, 200)
+
+    def test_url_available_by_name(self):  
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertRedirects(response, '/accounts/login/?next=/intervals/answered')
+
+    def test_template_name_correct(self):  
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertTemplateUsed(response, "exercises/intervals_answered.html")
+
+    def test_template_content(self):
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertContains(response, "Repeat")
+        self.assertContains(response, "Next")
+        # "next" button should have link to intervals question view
+        self.assertContains(response, reverse("exercises:intervals_question"))
+    
+    def test_post_request(self):
+        response = self.client.post(reverse("exercises:intervals_answered"))
+        self.assertRedirects(response, reverse("exercises:intervals_answered"))
+
+        
 class ScaleDegreesQuestionViewTests(SimpleTestCase):
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/scale-degrees/question")
@@ -118,4 +171,3 @@ class ScaleDegreesQuestionViewTests(SimpleTestCase):
         response = self.client.get(reverse("exercises:scale_degrees_question"))
         self.assertContains(response, "coming soon")
         self.assertContains(response, "Scale Degrees")
-        

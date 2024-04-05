@@ -15,7 +15,11 @@ class ChooseExerciseView(View):
 class IntervalsQuestionView(LoginRequiredMixin, View):
     def get(self, request):
         exercise = IntervalsExercise.objects.filter(user=request.user).first()
-        return render(request, 'exercises/intervals_question.html', context={"exercise": exercise})
+        context = {
+            "exercise": exercise,
+            "answers": exercise.answers.order_by("interval__num_semitones") if exercise else None
+        }
+        return render(request, 'exercises/intervals_question.html', context=context)
     
     @method_decorator(csrf_protect)
     def post(self, request):
@@ -26,6 +30,15 @@ class IntervalsQuestionView(LoginRequiredMixin, View):
         updater.generate_new_question()
         updater.save_audio_files()
         return redirect('exercises:intervals_question')
+
+class IntervalsAnsweredView(LoginRequiredMixin, View):
+    def get(self, request):
+        context = {}
+        return render(request, 'exercises/intervals_answered.html', context=context)
+    
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        return redirect('exercises:intervals_answered')
     
 
 class ScaleDegreesQuestionView(View):
