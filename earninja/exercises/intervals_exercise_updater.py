@@ -66,6 +66,13 @@ class IntervalsExerciseUpdater:
         score.save()
         self.exercise.save()
     
+    def reset_score(self):
+        score = ExerciseScore.objects.get_or_create(intervalsexercise=self.exercise)[0]
+        score.num_correct_answers = 0
+        score.num_all_answers = 0
+        score.save()
+        self.exercise.save()
+    
     def _get_random_start_note(self):
         lowest_note = self.exercise.settings.lowest_octave * self.NUM_NOTES_IN_OCTAVE
         highest_note = (self.exercise.settings.highest_octave + 1) * self.NUM_NOTES_IN_OCTAVE - 1

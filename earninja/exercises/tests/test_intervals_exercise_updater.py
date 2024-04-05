@@ -14,6 +14,7 @@ from exercises.models import (
     IntervalsExerciseSettings,
     Interval,
     IntervalInstance,
+    ExerciseScore,
 )
 from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 
@@ -165,7 +166,7 @@ class IntervalsExerciseUpdaterTests(TestCase):
     
     @patch.object(IntervalsExerciseUpdater, '_get_random_question_interval')
     @patch.object(IntervalsExerciseUpdater, '_get_random_start_note', side_effect=[3, 3])
-    def test_generate_new_question_clears_prevous_correct_answer(
+    def test_generate_new_question_clears_previous_correct_answer(
         self,
         mock__get_random_start_note, 
         mock_get_random_question_interval
@@ -217,3 +218,16 @@ class IntervalsExerciseUpdaterTests(TestCase):
         exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
         self.assertEqual(exercise.score.num_all_answers, 1)
         self.assertEqual(exercise.score.num_correct_answers, 0)
+    
+    def test_reset_score(self):
+        self.updater.reset_score()
+        score = ExerciseScore.objects.get(intervalsexercise=self.updater.exercise)
+        self.assertEqual(score.num_correct_answers, 0)
+        self.assertEqual(score.num_all_answers, 0)
+        score.num_correct_answers = 10
+        score.num_all_answers = 24
+        score.save()
+        self.updater.reset_score()
+        score = ExerciseScore.objects.get(intervalsexercise=self.updater.exercise)
+        self.assertEqual(score.num_correct_answers, 0)
+        self.assertEqual(score.num_all_answers, 0)
