@@ -82,4 +82,4 @@ class ExerciseScore(models.Model):
         return f'{self.num_correct_answers}/{self.num_all_answers} ({self.display_as_percentage()})'
 
     def display_as_percentage(self):
-        return f'{100 * self.num_correct_answers / self.num_all_answers:.2f}%'
+        return f'{100 * self.num_correct_answers / self.num_all_answers:.2f}%' if self.num_all_answers else "100.00%"

@@ -1,1 +1,11 @@
 {% extends "exercises/intervals_base.html" %}
+
+{% block feedback %}
+{{ block.super }}
+
+{% if user_answer.is_correct %}
+<p class="text-success"><strong>Correct!</strong></p>
+{% else %}
+<p class="text-danger"><strong>Wrong</strong></p>
+{% endif %}
+{% endblock %}

@@ -170,3 +170,10 @@ class ExerciseScoreModelTests(TestCase):
 
     def test_display_as_percentage(self):
         self.assertEqual(self.score.display_as_percentage(), "33.33%")
+
+    def test_object_name_is_correct_when_num_all_answers_is_zero(self):
+        score = ExerciseScore.objects.create(
+            num_correct_answers=0,
+            num_all_answers=0,
+        )
+        self.assertEqual(str(score), "0/0 (100.00%)")

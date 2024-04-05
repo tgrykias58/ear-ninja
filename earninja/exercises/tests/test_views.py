@@ -5,7 +5,10 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from exercises.models import IntervalsExercise
+from exercises.models import (
+    IntervalsExercise,
+    ExerciseScore,
+)
 from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 
 
@@ -124,6 +127,25 @@ class IntervalsAnsweredViewTests(TestCase):
         self.test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
         self.test_user.save()
         self.client.login(username='test_user', password='r6S6FrpHzFqf')
+        self._generate_first_question()
+        self._set_correct_answer_in_session()
+
+    @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
+    def _generate_first_question(self, mock_save_audio_files):
+        return self.client.post(reverse("exercises:intervals_question"))
+
+    def _set_correct_answer_in_session(self):
+        exercise = IntervalsExercise.objects.get(user=self.test_user)
+        session = self.client.session
+        session["user_answer_id"] = str(exercise.question.id)
+        session.save()
+
+    def _set_wrong_answer_in_session(self):
+        exercise = IntervalsExercise.objects.get(user=self.test_user)
+        wrong_answer = exercise.answers.exclude(id=exercise.question.id).first()
+        session = self.client.session
+        session["user_answer_id"] = str(wrong_answer.id)
+        session.save()
 
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/intervals/answered")
@@ -149,11 +171,43 @@ class IntervalsAnsweredViewTests(TestCase):
         # "next" button should have link to intervals question view
         self.assertContains(response, reverse("exercises:intervals_question"))
     
-    def test_post_request(self):
-        response = self.client.post(reverse("exercises:intervals_answered"))
-        self.assertRedirects(response, reverse("exercises:intervals_answered"))
+    def test_template_content_correct_answer(self):
+        self._set_correct_answer_in_session()
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertContains(response, "Correct")
+        self.assertNotContains(response, "Wrong")
+    
+    def test_template_content_wrong_answer(self):
+        self._set_wrong_answer_in_session()
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertContains(response, "Wrong")
+        self.assertNotContains(response, "Correct")
+    
+    def test_template_content_score_is_displayed(self):
+        exercise = IntervalsExercise.objects.get(user=self.test_user)
+        exercise.score = ExerciseScore.objects.create(
+            num_correct_answers = 6,
+            num_all_answers = 9,
+        )
+        exercise.save()
+        response = self.client.get(reverse("exercises:intervals_answered"))
+        self.assertContains(response, "Score: 6/9 (66.67%)")
 
-        
+    def test_post_request_modifies_session(self):
+        session = self.client.session
+        session["user_answer_id"] = '2'
+        session.save()
+        response = self.client.post(reverse("exercises:intervals_answered"), {"answer_id": 1})
+        self.assertRedirects(response, reverse("exercises:intervals_answered"))
+        self.assertEqual(self.client.session["user_answer_id"], '1')
+    
+    def test_post_request_updates_score(self):
+        response = self.client.post(reverse("exercises:intervals_answered"), {"answer_id": 1})
+        self.assertRedirects(response, reverse("exercises:intervals_answered"))
+        exercise = IntervalsExercise.objects.get(user=self.test_user)
+        self.assertEqual(exercise.score.num_all_answers, 1)
+
+
 class ScaleDegreesQuestionViewTests(SimpleTestCase):
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/scale-degrees/question")

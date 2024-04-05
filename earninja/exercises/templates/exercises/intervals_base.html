@@ -9,6 +9,14 @@
 <!-- Forms for POST buttons -->
 <form action="{% url 'exercises:intervals_question' %}" method="post" id="next-button-form">{% csrf_token %}</form>
 
+<div class="container h5 h-50">
+    {% block feedback %} 
+    <p>
+        Score: {{ exercise.score }}
+    </p>
+    {% endblock %} 
+</div>
+
 <div class="container">
     <div class="row mb-4">
         {% block answers %}{% endblock %}

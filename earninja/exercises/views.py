@@ -4,7 +4,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from exercises.models import IntervalsExercise
+from exercises.models import (
+    IntervalsExercise,
+    IntervalAnswer,
+)
 from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 
 
@@ -33,13 +36,27 @@ class IntervalsQuestionView(LoginRequiredMixin, View):
 
 class IntervalsAnsweredView(LoginRequiredMixin, View):
     def get(self, request):
-        context = {}
+        exercise = IntervalsExercise.objects.get(user=request.user)
+        user_answer = IntervalAnswer.objects.get(
+            exercise=exercise, 
+            interval_instance_id=request.session["user_answer_id"]
+        )
+        context = {
+            "exercise": exercise,
+            "user_answer": user_answer,
+            "correct_answer": exercise.answers.get(intervalanswer__is_correct=True),
+            "answers": exercise.answers.order_by("interval__num_semitones"),
+        }
         return render(request, 'exercises/intervals_answered.html', context=context)
-    
+
     @method_decorator(csrf_protect)
     def post(self, request):
+        exercise = IntervalsExercise.objects.get(user=request.user)
+        request.session["user_answer_id"] = request.POST["answer_id"]
+        user_answer = exercise.answers.get(id=request.POST["answer_id"])
+        IntervalsExerciseUpdater(exercise).update_score(user_answer)
         return redirect('exercises:intervals_answered')
-    
+
 
 class ScaleDegreesQuestionView(View):
     def get(self, request):
