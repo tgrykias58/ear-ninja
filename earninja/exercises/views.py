@@ -29,8 +29,9 @@ class IntervalsQuestionView(LoginRequiredMixin, View):
         # generate new question when "next" or "start" button is clicked
         exercise, created = IntervalsExercise.objects.get_or_create(user=request.user)
         updater = IntervalsExerciseUpdater(exercise)
-        if created: updater.set_default_settings()
-        if created: updater.reset_score()
+        if created:
+            updater.set_default_settings()
+            updater.reset_score()
         updater.generate_new_question()
         updater.save_audio_files()
         return redirect('exercises:intervals_question')
