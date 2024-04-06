@@ -2,10 +2,31 @@
 
 {% block feedback %}
 {{ block.super }}
-
 {% if user_answer.is_correct %}
 <p class="text-success"><strong>Correct!</strong></p>
 {% else %}
 <p class="text-danger"><strong>Wrong</strong></p>
 {% endif %}
 {% endblock %}
+
+{% block answers %} 
+{% for answer in answers %}
+<div class="col d-grid">
+    <button class="answer-button btn btn-primary" type="button" data-audio-url={{ answer.get_audio_url }}>
+        {{ answer.interval.name }}
+    </button>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block javascript_code %} 
+{{ block.super }}
+<script>
+const answerButtons = document.querySelectorAll(".answer-button")
+answerButtons.forEach(button => {
+    button.addEventListener("click", event => {
+        playAudio(event.currentTarget.dataset.audioUrl);
+    })
+})
+</script>
+{% endblock%}

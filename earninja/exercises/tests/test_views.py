@@ -172,6 +172,9 @@ class IntervalsAnsweredViewTests(TestCase):
         # "next" button should have link to intervals question view
         self.assertContains(response, reverse("exercises:intervals_question"))
         self.assertContains(response, "Score: 0/0 (100.00%)")
+        # buttons for playing audio of possible answers are present
+        for interval_name in settings.INTERVALS_DEFAULT_ALLOWED_INTERVALS:
+            self.assertContains(response, interval_name)
     
     def test_template_content_correct_answer(self):
         self._set_correct_answer_in_session()
