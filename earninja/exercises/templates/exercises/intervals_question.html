@@ -10,3 +10,12 @@
 </div>
 {% endfor %}
 {% endblock %}
+
+{% block javascript_code %} 
+{{ block.super }}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    playAudio('{{ exercise.question.get_audio_url }}');
+});
+</script>
+{% endblock%}
