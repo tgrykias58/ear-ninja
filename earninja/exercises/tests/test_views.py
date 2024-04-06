@@ -179,14 +179,18 @@ class IntervalsAnsweredViewTests(TestCase):
     def test_template_content_correct_answer(self):
         self._set_correct_answer_in_session()
         response = self.client.get(reverse("exercises:intervals_answered"))
-        self.assertContains(response, "Correct")
+        self.assertContains(response, "Correct!")
         self.assertNotContains(response, "Wrong")
+        self.assertContains(response, "Correct answer:")
+        self.assertContains(response, "Your answer:")
     
     def test_template_content_wrong_answer(self):
         self._set_wrong_answer_in_session()
         response = self.client.get(reverse("exercises:intervals_answered"))
         self.assertContains(response, "Wrong")
-        self.assertNotContains(response, "Correct")
+        self.assertNotContains(response, "Correct!")
+        self.assertContains(response, "Correct answer:")
+        self.assertContains(response, "Your answer:")
     
     def test_template_content_score_is_displayed(self):
         exercise = IntervalsExercise.objects.get(user=self.test_user)

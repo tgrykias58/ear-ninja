@@ -7,6 +7,18 @@
 {% else %}
 <p class="text-danger"><strong>Wrong</strong></p>
 {% endif %}
+<p>
+    Correct answer: 
+    <span class="text-success">
+        {{ correct_answer.interval.name }}
+    </span>
+</p>
+<p>
+    Your answer: 
+    <span class={% if user_answer.is_correct %}"text-success"{% else %}"text-danger"{% endif %}>
+        {{ user_answer.interval_instance.interval.name }}
+    </span>
+</p>
 {% endblock %}
 
 {% block answers %} 
