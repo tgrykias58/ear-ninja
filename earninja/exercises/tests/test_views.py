@@ -84,9 +84,10 @@ class IntervalsQuestionViewTests(TestCase):
 
     def test_template_content_before_first_question(self):
         response = self.client.get(reverse("exercises:intervals_question"))
-        self.assertContains(response, "Repeat")
-        self.assertContains(response, "Next")
-        # "next" button should have link to intervals question view
+        self.assertNotContains(response, "Repeat")
+        self.assertNotContains(response, "Next")
+        self.assertContains(response, "Start")
+        # "start" button should have link to intervals question view
         self.assertContains(response, reverse("exercises:intervals_question"))
     
     @patch.object(IntervalsExerciseUpdater, 'save_audio_files')

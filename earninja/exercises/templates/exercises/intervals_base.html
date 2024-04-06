@@ -6,9 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<!-- Forms for POST buttons -->
-<form action="{% url 'exercises:intervals_question' %}" method="post" id="next-button-form">{% csrf_token %}</form>
-
+{% if exercise %}
 <div class="container h5 h-50">
     {% block feedback %} 
     <p>
@@ -26,6 +24,7 @@
             <button type="button" id="repeat-button" class="btn btn-outline-success btn-lg">Repeat</button>
         </div>
         <div class="col-md-2 d-grid">
+            <form action="{% url 'exercises:intervals_question' %}" method="post" id="next-button-form">{% csrf_token %}</form>
             <button type="submit" class="btn btn-outline-success btn-lg" form="next-button-form">Next</button>
         </div>
         <div class="col-2 offset-md-6 d-grid">
@@ -45,6 +44,13 @@
         </div>
     </div>
 </div>
+{% else %}
+<form action="{% url 'exercises:intervals_question' %}" method="post" id="start-button-form">{% csrf_token %}</form>
+<div class="container">
+    <button type="submit" class="btn btn-success btn-lg" form="start-button-form">Start</button>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block javascript_code %}

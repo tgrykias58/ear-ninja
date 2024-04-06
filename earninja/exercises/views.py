@@ -14,7 +14,8 @@ from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 class ChooseExerciseView(View):
     def get(self, request):
         return render(request, 'exercises/choose_exercise.html')
-    
+
+
 class IntervalsQuestionView(LoginRequiredMixin, View):
     def get(self, request):
         exercise = IntervalsExercise.objects.filter(user=request.user).first()
@@ -35,6 +36,7 @@ class IntervalsQuestionView(LoginRequiredMixin, View):
         updater.generate_new_question()
         updater.save_audio_files()
         return redirect('exercises:intervals_question')
+
 
 class IntervalsAnsweredView(LoginRequiredMixin, View):
     def get(self, request):
