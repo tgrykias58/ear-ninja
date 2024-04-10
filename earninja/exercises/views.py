@@ -1,13 +1,17 @@
 from django.views import View
+from django.views.generic.edit import UpdateView
+from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from exercises.models import (
     IntervalsExercise,
     IntervalAnswer,
+    IntervalsExerciseSettings,
 )
+from exercises.forms import IntervalsExerciseSettingsForm
 from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
 
 
@@ -60,6 +64,27 @@ class IntervalsAnsweredView(LoginRequiredMixin, View):
         user_answer = exercise.answers.get(id=request.POST["answer_id"])
         IntervalsExerciseUpdater(exercise).update_score(user_answer)
         return redirect('exercises:intervals_answered')
+
+
+class IntervalsSettingsView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = IntervalsExerciseSettings
+    form_class = IntervalsExerciseSettingsForm
+    template_name = "exercises/intervals_settings.html"
+    success_url = reverse_lazy('exercises:intervals_question')
+
+    def test_func(self):
+        settings = self.get_object()
+        return settings.exercise.user == self.request.user
+
+    def form_valid(self, form):
+        redirect_url = super().form_valid(form)
+        settings = self.get_object()
+        updater = IntervalsExerciseUpdater(settings.exercise)
+        updater.set_allowed_intervals(form.cleaned_data['allowed_intervals'])
+        # generate new question using new settings
+        updater.generate_new_question()
+        updater.save_audio_files()
+        return redirect_url
 
 
 class ScaleDegreesQuestionView(View):

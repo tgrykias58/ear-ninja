@@ -5,6 +5,15 @@
 <script type="text/javascript" src="{% static 'exercises/audio.js' %}"></script>
 {% endblock %}
 
+{% block nav_items %}
+{% if exercise %}
+<li class="nav-item">
+    <a href="{% url "exercises:intervals_settings" pk=exercise.settings.id %}" class="btn btn-outline-warning" role="button">Exercise settings</a>
+</li>
+{% endif %}
+{{ block.super }}
+{% endblock %}
+
 {% block content %}
 {% if exercise %}
 <div class="container h5 h-50">

@@ -9,13 +9,14 @@ from exercises.models import (
     IntervalInstance,
     IntervalAnswer,
 )
-from exercises.music_theory_utils import get_num_semitones
+from exercises.music_theory_utils import (
+    NUM_NOTES_IN_OCTAVE,
+    get_num_semitones,
+)
 from exercises.tasks import update_interval_instance_audio
 
 
 class IntervalsExerciseUpdater:
-    NUM_NOTES_IN_OCTAVE = 12
-
     def __init__(self, exercise):
         self.exercise = exercise
 
@@ -40,10 +41,10 @@ class IntervalsExerciseUpdater:
     def set_default_settings(self):
         IntervalsExerciseSettings.objects.filter(exercise=self.exercise).delete()
         default_settings = IntervalsExerciseSettings.objects.create(
-            lowest_octave=settings.INTERVALS_DEFAULT_LOWEST_OCTAVE,
-            highest_octave=settings.INTERVALS_DEFAULT_HIGHEST_OCTAVE
+            lowest_octave=settings.INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE,
+            highest_octave=settings.INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE
         )
-        self._set_allowed_intervals(default_settings, settings.INTERVALS_DEFAULT_ALLOWED_INTERVALS)
+        self._set_allowed_intervals(default_settings, settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS)
         self.exercise.settings = default_settings
         self.exercise.save()
     
@@ -73,9 +74,12 @@ class IntervalsExerciseUpdater:
         score.save()
         self.exercise.save()
     
+    def set_allowed_intervals(self, allowed_interval_names):
+        self._set_allowed_intervals(self.exercise.settings, allowed_interval_names)
+    
     def _get_random_start_note(self):
-        lowest_note = self.exercise.settings.lowest_octave * self.NUM_NOTES_IN_OCTAVE
-        highest_note = (self.exercise.settings.highest_octave + 1) * self.NUM_NOTES_IN_OCTAVE - 1
+        lowest_note = self.exercise.settings.lowest_octave * NUM_NOTES_IN_OCTAVE
+        highest_note = (self.exercise.settings.highest_octave + 1) * NUM_NOTES_IN_OCTAVE - 1
         return random.randint(lowest_note, highest_note)
 
     def _get_random_question_interval(self):
