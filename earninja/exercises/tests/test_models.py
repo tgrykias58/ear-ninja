@@ -12,17 +12,19 @@ from exercises.models import (
 
 
 class IntervalModelTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         Interval.objects.create(name="b3", num_semitones=3)
-        Interval.objects.create(name="5", num_semitones=7)
+        Interval.objects.create(name="5", num_semitones=7, interval_type=1)
+        Interval.objects.create(name="#4", num_semitones=6, interval_type=2)
 
-    def test_object_name_is_interval_name(self):
+    def test_object_name_is_interval_name_followed_by_interval_type(self):
         interval_b3 = Interval.objects.get(id=1)
         interval_5 = Interval.objects.get(id=2)
+        interval_aug4 = Interval.objects.get(id=3)
 
-        self.assertEqual(str(interval_b3), "b3")
-        self.assertEqual(str(interval_5), "5")
+        self.assertEqual(str(interval_b3), "minor third, harmonic")
+        self.assertEqual(str(interval_5), "perfect fifth, melodic ascending")
+        self.assertEqual(str(interval_aug4), "augmented fourth, melodic descending")
 
 
 class IntervalInstanceModelTests(TestCase):
@@ -30,14 +32,14 @@ class IntervalInstanceModelTests(TestCase):
         self.interval_b3 = Interval.objects.create(name="b3", num_semitones=3)
 
         IntervalInstance.objects.create(start_note=4*12, interval=self.interval_b3)
-        IntervalInstance.objects.create(start_note=4*12 + 5, interval=self.interval_b3)
+        IntervalInstance.objects.create(start_note=2*12 + 6, interval=self.interval_b3)
     
     def test_object_name_is_interval_name_comma_start_note(self):
         interval_instance_1 = IntervalInstance.objects.get(id=1)
         interval_instance_2 = IntervalInstance.objects.get(id=2)
 
-        self.assertEqual(str(interval_instance_1), "b3, start note: 48")
-        self.assertEqual(str(interval_instance_2), "b3, start note: 53")
+        self.assertEqual(str(interval_instance_1), "minor third, harmonic, start note: C-4")
+        self.assertEqual(str(interval_instance_2), "minor third, harmonic, start note: F#-2")
     
     def test_get_audio_url(self):
         interval_instance_1 = IntervalInstance.objects.get(id=1)
@@ -86,7 +88,7 @@ class IntervalsExerciseModelTests(TestCase):
         answer.save()
     
     def test_object_name_is_exercise_for_user(self):
-        self.assertEqual(str(self.exercise), 'exercise for user: test_user')
+        self.assertEqual(str(self.exercise), 'intervals exercise for user: test_user')
     
     def test_through_table_object_name_is_interval_name(self):
         answer_interval_instance = self.exercise.answers.get(interval__name="#4")
@@ -154,7 +156,7 @@ class IntervalsExerciseSettingsModelTests(TestCase):
         )
         self.assertEqual(
             str(self.settings),
-            "settings for exercise for user: test_user"
+            "settings for intervals exercise for user: test_user"
         )
 
 

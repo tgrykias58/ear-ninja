@@ -44,7 +44,11 @@ class IntervalsExerciseUpdater:
             lowest_octave=settings.INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE,
             highest_octave=settings.INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE
         )
-        self._set_allowed_intervals(default_settings, settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS)
+        self._set_allowed_intervals(
+            default_settings, 
+            settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS,
+            settings.INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE,
+        )
         self.exercise.settings = default_settings
         self.exercise.save()
     
@@ -74,8 +78,8 @@ class IntervalsExerciseUpdater:
         score.save()
         self.exercise.save()
     
-    def set_allowed_intervals(self, allowed_interval_names):
-        self._set_allowed_intervals(self.exercise.settings, allowed_interval_names)
+    def set_allowed_intervals(self, allowed_interval_names, interval_type):
+        self._set_allowed_intervals(self.exercise.settings, allowed_interval_names, interval_type)
     
     def _get_random_start_note(self):
         lowest_note = self.exercise.settings.lowest_octave * NUM_NOTES_IN_OCTAVE
@@ -90,10 +94,11 @@ class IntervalsExerciseUpdater:
         answer.is_correct = True
         answer.save()
 
-    def _set_allowed_intervals(self, exercise_settings, allowed_interval_names):
+    def _set_allowed_intervals(self, exercise_settings, allowed_interval_names, interval_type):
         allowed_intervals = [
             Interval.objects.get_or_create(
                 num_semitones=get_num_semitones(interval_name),
+                interval_type=interval_type,
                 defaults={"name": interval_name}
             )[0]
             for interval_name in allowed_interval_names

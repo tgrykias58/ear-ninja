@@ -24,6 +24,7 @@ from exercises.intervals_exercise_updater import IntervalsExerciseUpdater
     INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE=3,
     INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE=5,
     INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS=["1", "b3", "3", "4", "5"],
+    INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE=0,
 )
 class IntervalsExerciseUpdaterTests(TestCase):
     def setUp(self):
@@ -84,6 +85,8 @@ class IntervalsExerciseUpdaterTests(TestCase):
         self.assertEqual(exercise.settings.highest_octave, settings.INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE)
         actual_allowed_interval_names = sorted([interval.name for interval in exercise.settings.allowed_intervals.all()])
         self.assertListEqual(actual_allowed_interval_names, sorted(settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS))
+        for interval in exercise.settings.allowed_intervals.all():
+            self.assertEqual(interval.interval_type, settings.INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE)
     
     @override_settings(USE_CELERY=True)
     @patch('exercises.intervals_exercise_updater.update_interval_instance_audio')
@@ -238,11 +241,16 @@ class IntervalsExerciseUpdaterTests(TestCase):
         self.assertEqual(score.num_all_answers, 0)
     
     def test_set_allowed_intervals(self):
+        Interval.objects.create(name="b3", num_semitones=3, interval_type=1)
+        Interval.objects.create(name="#4", num_semitones=6, interval_type=1)
+        Interval.objects.create(name="5", num_semitones=7, interval_type=1)
         self.updater.set_default_settings()
-        self.updater.set_allowed_intervals(["b2", "b5", "#2", '5'])
+        self.updater.set_allowed_intervals(["b2", "b5", "#2", '5'], interval_type=1)
         exercise = IntervalsExercise.objects.get(id=self.updater.exercise.id)
         actual_allowed_interval_names = sorted([interval.name for interval in exercise.settings.allowed_intervals.all()])
         # some names of intervals are different
         # because interval objects with the same numbers of semitones but alternative names
-        # were already created in setUp
+        # have been already created
         self.assertListEqual(actual_allowed_interval_names, sorted(['b2', 'b3', '#4', '5']))
+        for interval in exercise.settings.allowed_intervals.all():
+            self.assertEqual(interval.interval_type, 1)

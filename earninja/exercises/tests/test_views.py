@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from pathlib import Path
 
 from mingus.containers import Note
 
@@ -62,9 +63,11 @@ class ChooseExerciseViewTests(TestCase):
 
 
 @override_settings(
+    MEDIA_ROOT=Path(settings.MEDIA_ROOT) / "test",
     INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE=3,
     INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE=5,
     INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS=["1", "b3", "3", "4", "5"],
+    INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE=0,
 )
 class IntervalsQuestionViewTests(TestCase):
     def setUp(self):
@@ -134,9 +137,11 @@ class IntervalsQuestionViewTests(TestCase):
 
 
 @override_settings(
+    MEDIA_ROOT=Path(settings.MEDIA_ROOT) / "test",
     INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE=3,
     INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE=5,
     INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS=["1", "b3", "3", "4", "5"],
+    INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE=0,
 )
 class IntervalsAnsweredViewTests(TestCase):
     def setUp(self):
@@ -237,9 +242,11 @@ class IntervalsAnsweredViewTests(TestCase):
 
 
 @override_settings(
+    MEDIA_ROOT=Path(settings.MEDIA_ROOT) / "test",
     INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE=3,
     INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE=5,
     INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS=["1", "b3", "3", "4", "5"],
+    INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE=0,
 )
 class IntervalsSettingsViewTests(TestCase):
     def setUp(self):
@@ -304,7 +311,8 @@ class IntervalsSettingsViewTests(TestCase):
             reverse("exercises:intervals_settings", kwargs={"pk": exercise_settings.id}), {
             'lowest_octave': -1,
             'highest_octave': 1,
-            'allowed_intervals': ["b2", "b7", "6"]
+            'allowed_intervals': ["b2", "b7", "6"],
+            'interval_type': 2,
         })
         self.assertRedirects(response, reverse("exercises:intervals_question"))
         # settings has changed from default ones
@@ -313,10 +321,13 @@ class IntervalsSettingsViewTests(TestCase):
         self.assertEqual(exercise_settings.highest_octave, 1)
         actual_allowed_interval_names = sorted([interval.name for interval in exercise_settings.allowed_intervals.all()])
         self.assertListEqual(actual_allowed_interval_names, sorted(["b2", "b7", "6"]))
+        for interval in exercise_settings.allowed_intervals.all():
+            self.assertEqual(interval.interval_type, 2)
         # new question generated using new settings
         exercise = IntervalsExercise.objects.get(user=self.test_user_2)
         self.assertIn(Note().from_int(exercise.question.start_note).octave, [-1, 0, 1])
         self.assertIn(exercise.question.interval.name, ["b2", "b7", "6"])
+        self.assertEqual(exercise.question.interval.interval_type, 2)
         mock_save_audio_files.assert_called_once()
 
 

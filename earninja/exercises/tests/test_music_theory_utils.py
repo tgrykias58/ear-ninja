@@ -3,7 +3,9 @@ from django.test import SimpleTestCase
 from exercises.music_theory_utils import (
     get_num_semitones,
     get_interval_long_name,
+    get_note_name,
     get_interval_choices,
+    get_interval_type_choices,
 )
 
 
@@ -38,6 +40,9 @@ class MusicTheoryUtilsTests(SimpleTestCase):
     def test_get_interval_long_name_for_octave(self):
         self.assertEqual(get_interval_long_name("8"), 'octave')
 
+    def test_get_note_name(self):
+        self.assertEqual(get_note_name(3*12 + 10), 'A#-3')
+
     def test_get_interval_choces(self):
         self.assertListEqual(
             get_interval_choices(),
@@ -53,4 +58,10 @@ class MusicTheoryUtilsTests(SimpleTestCase):
             ('6', 'major sixth (6)'),
             ('b7', 'minor seventh (b7)'),
             ('7', 'major seventh (7)')]
+        )
+
+    def test_get_interval_type_choices(self):
+        self.assertListEqual(
+            get_interval_type_choices(), 
+            [(0, 'harmonic'), (1, 'melodic ascending'), (2, 'melodic descending')]
         )

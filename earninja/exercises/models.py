@@ -3,17 +3,30 @@ from django.db.models import UniqueConstraint
 from django.conf import settings
 
 from exercises.audio_file_path_manager import AudioFilePathManager
+from exercises.music_theory_utils import (
+    get_interval_long_name,
+    get_note_name,
+    get_interval_type_choices,
+    INTERVAL_TYPES,
+)
 
 
 class Interval(models.Model):
     num_semitones = models.IntegerField()
     name = models.CharField(max_length=30)
+    interval_type = models.IntegerField(choices=get_interval_type_choices(), default=0)
 
     class Meta:
         ordering = ['num_semitones']
+        constraints = [
+            UniqueConstraint(  
+                fields=['num_semitones', 'interval_type'],
+                name='interval_is_defined_by_num_semitones_and_type'
+            )
+        ]
 
     def __str__(self):
-        return self.name
+        return f'{get_interval_long_name(self.name)}, {INTERVAL_TYPES[self.interval_type]}'
 
 
 class IntervalInstance(models.Model):
@@ -30,7 +43,7 @@ class IntervalInstance(models.Model):
         ]
         
     def __str__(self):
-        return f'{self.interval.name}, start note: {self.start_note}'
+        return f'{self.interval}, start note: {get_note_name(self.start_note)}'
     
     # thanks to this method
     # the url can be accessed even before audio FileField is set
@@ -50,7 +63,7 @@ class IntervalsExercise(models.Model):
     score = models.OneToOneField("ExerciseScore", null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'exercise for user: {self.user}'
+        return f'intervals exercise for user: {self.user}'
 
 
 class IntervalAnswer(models.Model):

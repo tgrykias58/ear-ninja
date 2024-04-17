@@ -3,8 +3,8 @@ from pathlib import Path
 
 from django.conf import settings
 
-from mingus.containers import NoteContainer, Note
-from mingus.midi.midi_file_out import write_NoteContainer
+from mingus.containers import NoteContainer, Note, Bar
+from mingus.midi.midi_file_out import write_NoteContainer, write_Bar
 from pydub import AudioSegment
 
 
@@ -13,10 +13,15 @@ class AudioSaver:
         self.audio_path = Path(audio_path)
         self._load_settings()
     
-    def save_interval_instance_audio(self, start_note, interval_name):
+    def save_interval_instance_audio(self, start_note, interval_name, interval_type):
         self._ensure_audio_dir_exists()
-        interval_container = self._get_interval_container(start_note, interval_name)
-        self._save_midi(interval_container)
+        if interval_type == 0:
+            interval_mingus_object = self._get_harmonic_interval(start_note, interval_name)
+        elif interval_type == 1:
+            interval_mingus_object = self._get_melodic_interval(start_note, interval_name, ascending=True)
+        elif interval_type == 2:
+            interval_mingus_object = self._get_melodic_interval(start_note, interval_name, ascending=False)
+        self._save_midi(interval_mingus_object)
         self._midi_to_wav()
         self._wav_to_mp3()
     
@@ -34,12 +39,30 @@ class AudioSaver:
     def _ensure_audio_dir_exists(self):
         self.audio_path.parent.mkdir(parents=True, exist_ok=True)
     
-    def _get_interval_container(self, start_note, interval_name):
+    def _get_harmonic_interval(self, start_note, interval_name):
         start_note = Note().from_int(start_note)
         return NoteContainer().from_interval(start_note, interval_name)
     
-    def _save_midi(self, mingus_containter):
-        write_NoteContainer(self.audio_path.with_suffix(".mid"), mingus_containter)
+    def _get_melodic_interval(self, start_note, interval_name, ascending):
+        start_note = Note().from_int(start_note)
+        container = NoteContainer().from_interval(start_note, interval_name)
+        if len(container.notes) == 1:
+            note_1, note_2 = container.notes[0], container.notes[0]
+        elif ascending:
+            note_1, note_2 = container.notes
+        else:
+            note_2, note_1 = container.notes
+        bar = Bar()
+        bar.place_notes(note_1, 4)
+        bar.place_notes(note_2, 4)
+        return bar
+    
+    def _save_midi(self, interval_mingus_object):
+        path = self.audio_path.with_suffix(".mid")
+        if isinstance(interval_mingus_object, NoteContainer):
+            write_NoteContainer(path, interval_mingus_object)
+        elif isinstance(interval_mingus_object, Bar):
+            write_Bar(path, interval_mingus_object)
     
     def _midi_to_wav(self):
         midi_file = self.audio_path.with_suffix(".mid")

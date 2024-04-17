@@ -15,10 +15,22 @@ class AudioSaverTests(SimpleTestCase):
     def tearDown(self):
         shutil.rmtree(self.test_media_dir)
 
-    def test_save_interval_instance_audio(self):
+    def test_save_interval_instance_audio_for_harmonic(self):
+        self._test_save_interval_instance_audio(interval_name="#4", interval_type=0)
+    
+    def test_save_interval_instance_audio_for_melodic_ascending(self):
+        self._test_save_interval_instance_audio(interval_name="#4", interval_type=1)
+    
+    def test_save_interval_instance_audio_for_melodic_descending(self):
+        self._test_save_interval_instance_audio(interval_name="#4", interval_type=2)
+    
+    def test_save_interval_instance_audio_for_melodic_unison(self):
+        self._test_save_interval_instance_audio(interval_name="1", interval_type=1)
+
+    def _test_save_interval_instance_audio(self, interval_name, interval_type):
         audio_path = self.test_media_dir / "interval_42"
         audio_saver = AudioSaver(audio_path)
-        audio_saver.save_interval_instance_audio(start_note=4*12, interval_name="#4")
+        audio_saver.save_interval_instance_audio(start_note=4*12, interval_name=interval_name, interval_type=interval_type)
 
         saved_file_path = self.test_media_dir / "interval_42.mid"
         self.assertTrue(saved_file_path.is_file())

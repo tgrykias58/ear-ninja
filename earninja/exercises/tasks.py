@@ -23,7 +23,8 @@ def update_interval_instance_audio(interval_instance_id):
     audio_saver = AudioSaver(intermediate_audio_path)
     audio_saver.save_interval_instance_audio(
         interval_instance.start_note,
-        interval_instance.interval.name
+        interval_instance.interval.name,
+        interval_instance.interval.interval_type,
     )
 
     # delete the old audio file, if it already exists

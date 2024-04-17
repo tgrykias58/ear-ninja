@@ -80,7 +80,10 @@ class IntervalsSettingsView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         redirect_url = super().form_valid(form)
         settings = self.get_object()
         updater = IntervalsExerciseUpdater(settings.exercise)
-        updater.set_allowed_intervals(form.cleaned_data['allowed_intervals'])
+        updater.set_allowed_intervals(
+            form.cleaned_data['allowed_intervals'],
+            form.cleaned_data['interval_type'],
+        )
         # generate new question using new settings
         updater.generate_new_question()
         updater.save_audio_files()
