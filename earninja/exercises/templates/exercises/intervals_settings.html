@@ -5,12 +5,28 @@
 
 {% block content %}
 <div class="container">
-<h2>Intervals Exercise: settings</h2>
-<form class="mb-2" method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button class="btn btn-primary" type="submit">Save</button>
-</form>
-<a href="{% url "exercises:intervals_question" %}" class="btn btn-primary" role="button">Cancel</a>
+    <h2>Intervals Exercise: settings</h2>
+    <form class="mb-2" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a href="{% url "exercises:intervals_question" %}" class="btn btn-primary" role="button">Cancel</a>
+        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reset-settings-confirmation">Reset settings</button>
+    </form>
+    <div class="modal" id="reset-settings-confirmation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Are you sure you want to reset settings to default?</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-footer">
+                    <form action="{% url 'exercises:intervals_reset_settings' %}" method="post" id="reset-settings-button-form">{% csrf_token %}</form>
+                    <button type="submit" class="btn btn-success" form="reset-settings-button-form">Confirm</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.views import View
 from django.views.generic.edit import UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
@@ -102,6 +102,21 @@ class IntervalsResetScoreView(LoginRequiredMixin, View):
         updater.generate_new_question()
         updater.save_audio_files()
         return redirect('exercises:intervals_question')
+
+
+class IntervalsResetSettingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        exercise = IntervalsExercise.objects.get(user=request.user)
+        return redirect('exercises:intervals_settings', pk=exercise.settings.id)
+
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        exercise = IntervalsExercise.objects.get(user=request.user)
+        updater = IntervalsExerciseUpdater(exercise)
+        updater.set_default_settings()
+        updater.generate_new_question()
+        updater.save_audio_files()
+        return redirect('exercises:intervals_settings', pk=exercise.settings.id)
 
 
 class ScaleDegreesQuestionView(View):
