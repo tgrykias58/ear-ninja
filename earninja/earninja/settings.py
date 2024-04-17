@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'exercises.apps.ExercisesConfig',
     'accounts',
+    'django_extensions',
     'django_cleanup.apps.CleanupConfig',
 ]
 
