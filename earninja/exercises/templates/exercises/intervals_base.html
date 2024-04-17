@@ -10,6 +10,24 @@
 <li class="nav-item">
     <a href="{% url "exercises:intervals_settings" pk=exercise.settings.id %}" class="btn btn-outline-warning" role="button">Exercise settings</a>
 </li>
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reset-score-confirmation">Reset score</button>
+</li>
+<div class="modal" id="reset-score-confirmation">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure you want to reset score?</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-footer">
+                <form action="{% url 'exercises:intervals_reset_score' %}" method="post" id="reset-score-button-form">{% csrf_token %}</form>
+                <button type="submit" class="btn btn-success" form="reset-score-button-form">Confirm</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
 {{ block.super }}
 {% endblock %}

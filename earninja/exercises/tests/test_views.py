@@ -331,6 +331,46 @@ class IntervalsSettingsViewTests(TestCase):
         mock_save_audio_files.assert_called_once()
 
 
+@override_settings(
+    MEDIA_ROOT=Path(settings.MEDIA_ROOT) / "test",
+    INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE=3,
+    INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE=5,
+    INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS=["1", "b3", "3", "4", "5"],
+    INTERVALS_EXERCISE_DEFAULT_INTERVAL_TYPE=0,
+)
+class IntervalsResetScoreViewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.test_user = User.objects.create_user(username='test_user', password='r6S6FrpHzFqf')
+        self.test_user.save()
+        self.client.login(username='test_user', password='r6S6FrpHzFqf')
+        self._generate_first_question()
+    
+    @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
+    def _generate_first_question(self, mock_save_audio_files):
+        return self.client.post(reverse("exercises:intervals_question"))
+
+    def test_url_exists_at_correct_location(self):
+        response = self.client.get("/intervals/reset-score/")
+        self.assertRedirects(response, reverse("exercises:intervals_question"))
+
+    def test_url_available_by_name(self):  
+        response = self.client.get(reverse("exercises:intervals_reset_score"))
+        self.assertRedirects(response, reverse("exercises:intervals_question"))
+
+    @patch.object(IntervalsExerciseUpdater, 'save_audio_files')
+    def test_post_request_resets_score(self, mock_save_audio_files):
+        score = ExerciseScore.objects.get(intervalsexercise__user=self.test_user)
+        score.num_all_answers = 10
+        score.num_correct_answers = 6
+        score.save()
+        response = self.client.post(reverse("exercises:intervals_reset_score"))
+        self.assertRedirects(response, reverse("exercises:intervals_question"))
+        score = ExerciseScore.objects.get(intervalsexercise__user=self.test_user)
+        self.assertEqual(score.num_all_answers, 0)
+        self.assertEqual(score.num_correct_answers, 0)
+
+
 class ScaleDegreesQuestionViewTests(SimpleTestCase):
     def test_url_exists_at_correct_location(self):
         response = self.client.get("/scale-degrees/question/")

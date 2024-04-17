@@ -90,6 +90,20 @@ class IntervalsSettingsView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         return redirect_url
 
 
+class IntervalsResetScoreView(LoginRequiredMixin, View):
+    def get(self, request):
+        return redirect('exercises:intervals_question')
+
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        exercise = IntervalsExercise.objects.get(user=request.user)
+        updater = IntervalsExerciseUpdater(exercise)
+        updater.reset_score()
+        updater.generate_new_question()
+        updater.save_audio_files()
+        return redirect('exercises:intervals_question')
+
+
 class ScaleDegreesQuestionView(View):
     def get(self, request):
         return render(request, 'exercises/coming_soon.html', {"exercise_name": "Scale Degrees"})
