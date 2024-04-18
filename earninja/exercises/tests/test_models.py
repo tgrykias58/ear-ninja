@@ -93,7 +93,7 @@ class IntervalsExerciseModelTests(TestCase):
     def test_through_table_object_name_is_interval_name(self):
         answer_interval_instance = self.exercise.answers.get(interval__name="#4")
         answer = IntervalAnswer.objects.get(exercise=self.exercise, interval_instance=answer_interval_instance)
-        self.assertEqual(str(answer), '#4')
+        self.assertEqual(str(answer), 'answer: augmented fourth, harmonic for user: test_user')
     
     def test_deleting_answer_does_not_delete_exercise(self):
         self.assertEqual(self.exercise.answers.count(), 3)

@@ -72,7 +72,7 @@ class IntervalAnswer(models.Model):
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.interval_instance.interval.name
+        return f"answer: {self.interval_instance.interval} for user: {self.exercise.user}"
 
 
 class IntervalsExerciseSettings(models.Model):
