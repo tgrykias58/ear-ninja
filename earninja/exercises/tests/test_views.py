@@ -110,6 +110,7 @@ class IntervalsQuestionViewTests(TestCase):
         self.assertContains(response, "Next")
         # "next" button should have link to intervals question view
         self.assertContains(response, reverse("exercises:intervals_question"))
+        self.assertContains(response, "Exercise explanation")
         # buttons with answers are present
         for interval_name in settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS:
             self.assertContains(response, interval_name)
@@ -193,6 +194,7 @@ class IntervalsAnsweredViewTests(TestCase):
         self.assertContains(response, "Next")
         # "next" button should have link to intervals question view
         self.assertContains(response, reverse("exercises:intervals_question"))
+        self.assertContains(response, "Exercise explanation")
         self.assertContains(response, "Score: 0/0 (100.00%)")
         # buttons for playing audio of possible answers are present
         for interval_name in settings.INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS:

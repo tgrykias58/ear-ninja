@@ -8,6 +8,9 @@
 {% block nav_items %}
 {% if exercise %}
 <li class="nav-item">
+    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#exercise-explanation">Exercise explanation</button>
+</li>
+<li class="nav-item">
     <a href="{% url "exercises:intervals_settings" pk=exercise.settings.id %}" class="btn btn-outline-warning" role="button">Exercise settings</a>
 </li>
 <li class="nav-item">
@@ -24,6 +27,38 @@
                 <form action="{% url 'exercises:intervals_reset_score' %}" method="post" id="reset-score-button-form">{% csrf_token %}</form>
                 <button type="submit" class="btn btn-success" form="reset-score-button-form">Confirm</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="exercise-explanation">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Intervals exercise: explanation</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    In this exercise, two notes will be played.
+                    Your task is to specify the <a href="https://en.wikipedia.org/wiki/Interval_(music)" target="_blank">interval</a> between them.
+                </p>
+                <p>
+                    Intervals on answer buttons are displayed in their shorthand form 
+                    (e.g. "#4" is augmented fourth, "b3" is minor third, "5" is perfect fifth).
+                </p>
+                <p>
+                    If "interval type" setting is set to harmonic, then notes will be played simultaneously.
+                    If it's set to melodic, then notes will be played sequentially.
+                </p>
+                <p>
+                    To generate new question, click "Next" button.
+                    To play the question again, click "Repeat" button.
+                    After answering the question, you can listen to all possible answers by clicking answer buttons.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Got it!</button>
             </div>
         </div>
     </div>
