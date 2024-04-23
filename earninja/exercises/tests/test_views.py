@@ -299,7 +299,7 @@ class IntervalsSettingsViewTests(TestCase):
         response = self.client.get(reverse("exercises:intervals_settings", kwargs={"pk": exercise_settings.id}))
         self.assertContains(response, "Lowest octave")
         self.assertContains(response, "Highest octave")
-        self.assertContains(response, "Allowed intervals")
+        self.assertContains(response, "intervals to practice")
         # example choice
         self.assertContains(response, "perfect fifth (5)")
         # save and cancel buttons are present
