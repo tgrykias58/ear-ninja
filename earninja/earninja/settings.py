@@ -198,7 +198,7 @@ CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # default setttings for intervals exercise
-INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE = 3
+INTERVALS_EXERCISE_DEFAULT_LOWEST_OCTAVE = 2
 INTERVALS_EXERCISE_DEFAULT_HIGHEST_OCTAVE = 5
 INTERVALS_EXERCISE_DEFAULT_ALLOWED_INTERVALS = ["1", "b3", "3", "4", "5"]
 # 0 - harmonic, 1 - melodic ascending, 2 - melodic descending
