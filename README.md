@@ -134,3 +134,7 @@ Arguments 1 6 mean here that intervals will be generated for octaves from range 
 A downside of this approach is that if you're using a free account on PythonAnywhere, then you might exceed daily CPU allowance of 100 seconds.
 
 3. Just wait until the app "warms up" with usage and a never requested interval becomes a rare thing.
+
+## Known issues
+
+If [autoplay](https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide) is blocked on Firefox browser, then question audio doesn't play after clicking "Next" button (you have to click "Repeat" for each question). If you encounter this issue, you can solve it by [enabling autoplay](https://support.mozilla.org/en-US/kb/block-autoplay) for Ear Ninja.
