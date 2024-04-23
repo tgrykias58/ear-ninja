@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import UniqueConstraint 
+from django.db.models import UniqueConstraint
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.conf import settings
 
 from exercises.audio_file_path_manager import AudioFilePathManager
@@ -76,8 +77,18 @@ class IntervalAnswer(models.Model):
 
 
 class IntervalsExerciseSettings(models.Model):
-    lowest_octave = models.IntegerField()
-    highest_octave = models.IntegerField()
+    lowest_octave = models.IntegerField(
+        validators=[
+            MaxValueValidator(7),
+            MinValueValidator(-1)
+        ]
+    )
+    highest_octave = models.IntegerField(
+        validators=[
+            MaxValueValidator(7),
+            MinValueValidator(-1)
+        ]
+    )
     allowed_intervals = models.ManyToManyField(Interval)
 
     def __str__(self):
