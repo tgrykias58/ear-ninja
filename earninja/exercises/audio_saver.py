@@ -7,6 +7,8 @@ from mingus.containers import NoteContainer, Note, Bar
 from mingus.midi.midi_file_out import write_NoteContainer, write_Bar
 from pydub import AudioSegment
 
+from exercises.music_theory_utils import get_interval_container
+
 
 class AudioSaver:
     def __init__(self, audio_path):
@@ -40,12 +42,10 @@ class AudioSaver:
         self.audio_path.parent.mkdir(parents=True, exist_ok=True)
     
     def _get_harmonic_interval(self, start_note, interval_name):
-        start_note = Note().from_int(start_note)
-        return NoteContainer().from_interval(start_note, interval_name)
+        return get_interval_container(start_note, interval_name)
     
     def _get_melodic_interval(self, start_note, interval_name, ascending):
-        start_note = Note().from_int(start_note)
-        container = NoteContainer().from_interval(start_note, interval_name)
+        container = get_interval_container(start_note, interval_name)
         if len(container.notes) == 1:
             note_1, note_2 = container.notes[0], container.notes[0]
         elif ascending:

@@ -2,9 +2,18 @@ from mingus.containers import NoteContainer, Note
 
 
 NUM_NOTES_IN_OCTAVE = 12
-INTERVAL_NAMES = ['1', 'b2', '2', 'b3', '3', '4', '#4', '5', 'b6', '6', 'b7', '7']
+INTERVAL_NAMES = ['1', 'b2', '2', 'b3', '3', '4', '#4', '5', 'b6', '6', 'b7', '7', '8']
 INTERVAL_TYPES = ["harmonic", "melodic ascending", "melodic descending"]
 
+
+def get_interval_container(start_note_int, interval_name):
+    start_note = Note().from_int(start_note_int)
+    if interval_name == '8':
+        return NoteContainer([
+            start_note,
+            Note().from_int(start_note_int + NUM_NOTES_IN_OCTAVE)
+        ])
+    return NoteContainer().from_interval(start_note, interval_name)
 
 def get_num_semitones(interval_name):
     if interval_name == '1': return 0

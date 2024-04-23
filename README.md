@@ -129,7 +129,7 @@ Celery is [not supported on PythonAnywhere](https://www.pythonanywhere.com/forum
 cd ~/django_projects/ear-ninja/earninja/
 python manage.py runscript prepare_intervals --script-args 1 6
 ```
-Arguments 1 6 mean here that intervals will be generated for octaves from range 1, 6 (1 and 6 included). 
+Arguments 1 6 mean here that intervals will be generated for octaves from range 1, 6 (1 and 6 included).
 
 A downside of this approach is that if you're using a free account on PythonAnywhere, then you might exceed daily CPU allowance of 100 seconds.
 
