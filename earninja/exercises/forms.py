@@ -12,6 +12,7 @@ class IntervalsExerciseSettingsForm(forms.ModelForm):
     allowed_intervals = forms.MultipleChoiceField(
         choices=get_interval_choices(),
         widget=forms.CheckboxSelectMultiple,
+        label="Choose which intervals to practice"
     )
     interval_type = forms.ChoiceField(
         choices=get_interval_type_choices(),
