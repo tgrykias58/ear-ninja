@@ -143,7 +143,7 @@ Right after deployment, all intervals will be encountered for the first time, so
 Celery is [not supported on PythonAnywhere](https://www.pythonanywhere.com/forums/topic/1215/)
 
 ### Method 2: pre-generate audio files
- Pre-generate audio files for most frequently practiced intervals by running this script:
+ Pre-generate audio files, for most frequently practiced intervals, by running this script:
 ```
 cd ~/django_projects/ear-ninja/earninja/
 python manage.py runscript prepare_intervals --script-args 1 6
@@ -152,7 +152,7 @@ Arguments `1 6` mean here that intervals will be generated for octaves from rang
 
 A downside of this approach is that if you're using a free account on PythonAnywhere, then you might exceed daily CPU allowance of 100 seconds.
 
-### Method 3: wait until app "warms up"
+### Method 3: wait until the app "warms up"
  Just wait until the app "warms up" with usage, and an interval that has been never requested before, becomes a rare thing.
 
 ## Known issues
